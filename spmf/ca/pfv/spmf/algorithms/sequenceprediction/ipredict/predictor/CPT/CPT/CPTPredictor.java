@@ -1,14 +1,8 @@
 package ca.pfv.spmf.algorithms.sequenceprediction.ipredict.predictor.CPT.CPT;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Item;
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Sequence;
@@ -144,32 +138,48 @@ public class CPTPredictor extends Predictor {
 				branch.add(curNode.Item); //Adding node to the list
 			}
 			
-			int i = 0;
-			
-			//Go through the branch (top to bottom) and stop when
-			//it has encountered ALL items from the target
-			Set<Integer>  alreadySeen = new HashSet<Integer>();  
- 			for(i = branch.size()-1 ; i >=0 && alreadySeen.size() != hashTarget.size(); i-- ) { 
- 				// if it is an item from target
-                 if(hashTarget.contains(branch.get(i).val)) 
-                     alreadySeen.add(branch.get(i).val);
- 			}
- 			int consequentEndPosition = i;
-            
-			//For all the items found 
-			for(i = 0; i <= consequentEndPosition; i++) {
-				
-				float oldValue = 0;
-				if(CountTable.containsKey(branch.get(i).val)) {
-					oldValue = CountTable.get(branch.get(i).val);
-				}
+//			int i = 0;
+//
+//			//Go through the branch (top to bottom) and stop when
+//			//it has encountered ALL items from the target
+//			Set<Integer>  alreadySeen = new HashSet<Integer>();
+// 			for(i = branch.size()-1 ; i >=0 && alreadySeen.size() != hashTarget.size(); i-- ) {
+// 				// if it is an item from target
+//                 if(hashTarget.contains(branch.get(i).val))
+//                     alreadySeen.add(branch.get(i).val);
+// 			}
+// 			int consequentEndPosition = i;
+//
+//			//For all the items found
+//			for(i = 0; i <= consequentEndPosition; i++) {
+//
+//				float oldValue = 0;
+//				if(CountTable.containsKey(branch.get(i).val)) {
+//					oldValue = CountTable.get(branch.get(i).val);
+//				}
+//
+//				//Update the countable with the right weight and value
+//				float curValue = 1f /((float)indexes.cardinality());
+//
+//				CountTable.put(branch.get(i).val, oldValue + (curValue * weight) );
+//
+//				hashSidVisited.add(index);
+//			}
 
-				//Update the countable with the right weight and value
-				float curValue = 1f /((float)indexes.cardinality());
-				
-				CountTable.put(branch.get(i).val, oldValue + (curValue * weight) );
-				
-				hashSidVisited.add(index); 
+			List<Item> reversedBranch = new ArrayList<>(branch); // copy branch
+			Collections.reverse(reversedBranch); // reverse branch
+			List<Item> targetSequence = Arrays.asList(targetArray); // convert target sequence array to list
+			int startTargetSequenceIndex = Collections.indexOfSubList(reversedBranch, targetSequence);
+			int consequentEndPosition = startTargetSequenceIndex + targetSequence.size();
+
+			for(int i = consequentEndPosition; i < reversedBranch.size(); i++) {
+				float oldValue = 0;
+				if(CountTable.containsKey(reversedBranch.get(i).val)) {
+					oldValue = CountTable.get(reversedBranch.get(i).val);
+				}
+				float curValue = 1f / indexes.cardinality();
+				CountTable.put(reversedBranch.get(i).val, oldValue + (curValue * weight));
+				hashSidVisited.add(index);
 			}
 		}
 	}
@@ -259,7 +269,7 @@ public class CPTPredictor extends Predictor {
 	
 	/**
 	 * Predict the next element in the given sequence
-	 * @param sequence to predict
+	 * @param target sequence to predict
 	 */
 	public Sequence Predict(Sequence target) {
 		
@@ -353,7 +363,7 @@ public class CPTPredictor extends Predictor {
 					newSequence[currentPosition++] = targetArray[toUse];
 				}
 			}
-			
+
 			RecursiveDivider(newSequence, minSize, countTable, hashSidVisited, initialTargetArraySize);
 		}
 	}
