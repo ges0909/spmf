@@ -1,0 +1,103 @@
+Training Set
+============
+
+#1: 1.2.3
+#2: 1.2
+#3: 1.2.4.3
+#4: 2.3
+
+Prediction Model
+================
+
+PT:	1			2
+	|			|
+	2 - -  \ 	3
+		|   4
+	|	|   |
+	3 	    3
+  
+	^   ^ 	^ 	^
+	|   |   |   |
+LT:	#1	#2  #3  #4
+
+(Inverted Index)II:
+ 1: #1, #2, #3
+ 2: #1, #2, #3, #4
+ 3: #1, #3, #4
+ 4: #3
+
+Prediction
+==========
+
+Target Sequence:  => 1.2
+
+1) Find unique symbols of target seq.  => { 1, 2 } 
+
+2) Ask II for seq. containing unique symbols
+
+1: { #1, #2, #3 }
+2: { #1, #2, #3, #4 }
+
+3) Find similiar seq.s by intersection
+
+Similiar Sequences = { #1, #2, #3 }
+
+4) Find consequent for all similiar seq.s
+
+
+in #1 :
+
+a) Get last symbol of target seq. => 2
+b) Get longest sub-sequence after the last occurrence of the last item of the target seq. => 3
+c) Minus the symbols present in the target seq. => 3
+
+in #2 :
+
+a) Get last symbol of target seq. => 2
+b) Get longest sub-sequence after the last occurrence of the last item of the target seq. => notFound
+c) Minus the symbols present in the target seq. => notFound
+
+in #3 :
+
+a) Get last symbol of target seq. => 2
+b) Get longest sub-sequence after the last occurrence of the last item of the target seq. => 4, 3
+c) Minus the symbols present in the target seq. => 4, 3
+
+
+5) Add consequent symbols to Count Table (CT) 
+
+CT = {
+3: 1.33400
+4: 1.33383
+}
+
+score(3)   =  1 + (1/3) + 1 / (0+1) * 0.001 = 1.33433
+score(3,4) = 1 + (1/3) + 1 / (1+1) * 0.001 * 1.33433
+
+Symbol NOT present in CT:
+- score = 1 + (1/number of similar sequences) +(1/number of items currently in the countable dictionary + 1) * 0.001
+
+Symbol IS present in CT:
+- score = (1 + (1/number of similar sequences) +(1/number of items currently in the countable dictionary+1)*0.001) * oldscore
+
+
+Symbol 1: 
+
+  score = 1 + (1/3) + (1 / (2+1) * 0.001) =
+  
+Symbol 2: 
+
+  score = 1 + (1/3) + (1 / (2+1) * 0.001) =
+
+Symbol 3:
+
+  score = (1 + (1/3) + (1 / (2+1) * 0.001))* oldscore = () * oldscore
+  
+  
+Symbol 4:
+
+  score = (1 + (1/3) + (1 / (2+1) * 0.001))* oldscore = () * oldscore
+  
+  
+  
+  \left(1+\left(\frac{1}{3}\right)+\left(\frac{1}{3}\right)\cdot \:0.001\right)\cdot 0.001

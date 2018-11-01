@@ -1,0 +1,36 @@
+apply plugin: 'java'
+// apply plugin: 'application'
+
+dependencies {
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.3.1'
+}
+
+repositories {
+    jcenter()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'spmf']
+        }
+        resources {
+            srcDirs = ['src/main/resources', 'spmf']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java', 'spmf']
+        }
+        resources {
+            srcDirs = ['src/test/resources', 'spmf']
+        }
+    }
+}
+
+test {
+    // enable JUnit Platform (a.k.a. JUnit 5) support
+    useJUnitPlatform()
+}

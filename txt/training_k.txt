@@ -1,0 +1,72 @@
+Link:
+- https://www.analyticsvidhya.com/blog/2018/04/guide-sequence-prediction-using-compact-prediction-tree-python/
+
+Training Set
+============
+
+#1: 1.1.2.1.1.1.3
+#2: 1.1.1.1.1.1.1
+
+Prediction Model
+================
+
+PT:  -1
+      |
+      1
+      |
+      1
+      |
+      2 - 1
+      |   |
+      1   1
+      |   |
+      1   1
+      |   |
+      1   1
+      |   |
+      3   1
+         
+      ^   ^
+      |   |
+LT:	 #0	 #1
+
+II:
+ 1: #0, #1
+ 2: #0
+ 3: #0
+
+Prediction
+==========
+
+Target Sequence:
+=> 2.1.1.1
+
+1) Find unique symbols of target seq.
+
+=> { 1, 2 } 
+
+2) Ask II for seq. containing unique symbols
+
+1: { #0, #1 }
+2: { #0 }
+
+3) Find similiar seq.s by intersection
+
+Similiar Sequences = { #0 }
+
+4) Find consequent for all similiar seq.s
+
+a) Get last symbol of target seq. => 1
+b) Get longest sub-sequence after the last occurrence of the last item of the target seq. => 3
+c) Minus the symbols present in the target seq. => 3
+
+5) Add consequent symbols to Count Table (CT)
+
+CT = {}
+
+Symbol not present in CT:
+- score = 1 + (1/number of similar sequences) +(1/(number of items currently in the countable dictionary + 1)) * 0.001
+Otherwise:
+- score = (1 + (1/number of similar sequences) +(1/number of items currently in the countable dictionary+1)*0.001) * oldscore
+
+score(3) = 1 + (1 / 1) + 1 / ((0 + 1) * 0.001) = 1 + 1 + (1 * 0.001) = 1
